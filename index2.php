@@ -25,7 +25,7 @@
 
 <body>
   <div id="teeth" class="container">
-    <h1 class="text-center">Teeth</h1>
+    <h1 class="text-center">TEETH</h1>
     <div
       id="teeth-map"
       class="container d-grid justify-content-center"
@@ -292,6 +292,17 @@
           class="teeth"
           style="right: 41.4rem; top: 12.9rem; width: 41px; height: 23px"></div>
       </span>
+      <div>
+        <h2 class="text-center">TREATMENT PLAN</h2>
+        <table>
+          <tr>
+            <th>Teeth</th>
+            <th>Procedures</th>
+          </tr>
+          <tr>
+            <td>21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38</td>
+        </table>
+      </div>
       <script>
         //   document.querySelectorAll(".teeth").forEach((tooth) => {
         //     tooth.addEventListener("click", function () {
