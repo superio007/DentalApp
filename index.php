@@ -1,3 +1,9 @@
+<?php
+session_start();
+$formData = $_SESSION['patientData'];
+// session_unset();
+var_dump($formData);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -50,7 +56,7 @@
     {
         return rand(000000, 999999);
     }
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
         $name = $_POST['name'];
         $age = $_POST['age'];
         $sex = $_POST['sex'];
@@ -161,34 +167,33 @@
             'latex' => isset($_POST['latex']) ? 1 : 0,
             'others' => $conn->real_escape_string($_POST['others'] ?? ''),
         ];
-
         // Construct SQL query
         $sql = "
-INSERT INTO patient_records (
-    name, age, sex, patient_id, email, phone, address, reason, serious_illness, 
-    bad_breath, bleeding_gums, clicking_jaw, food_collecting, grinding_teeth, loose_teeth, pain, 
-    sensitivity_cold, sensitivity_hot, sensitivity_sweets, sores_mouth, swelling, reaction_anesthetic, 
-    pregnant, birth_control, nursing, anemia, arthritis, artificial_devices, asthma, autoimmune, 
-    bleeding_problem, cancer, hiv_aids, jaw_pain, kidney_disease, liver_disease, osteoporosis, 
-    psychiatric_treatment, respiratory_disease, local_anesthetic, nsaid, penicillin, latex, others
-) VALUES (
-    '$name', $age, '$sex', '$patientid', '$email', '$phone', '$address', '$reason', '$seriousIllness',
-    {$dentalHistory['badBreath']}, {$dentalHistory['bleedingGums']}, {$dentalHistory['clickingJaw']}, 
-    {$dentalHistory['foodCollecting']}, {$dentalHistory['grindingTeeth']}, {$dentalHistory['looseTeeth']}, {$dentalHistory['pain']}, 
-    {$dentalHistory['sensitivityCold']}, {$dentalHistory['sensitivityHot']}, {$dentalHistory['sensitivitySweets']}, 
-    {$dentalHistory['soresMouth']}, {$dentalHistory['swelling']}, {$dentalHistory['reactionAnesthetic']}, 
-    {$medicalHistory['pregnant']}, {$medicalHistory['birthControl']}, {$medicalHistory['nursing']}, 
-    {$medicalHistory['anemia']}, {$medicalHistory['arthritis']}, {$medicalHistory['artificialDevices']}, 
-    {$medicalHistory['asthma']}, {$medicalHistory['autoimmune']}, {$medicalHistory['bleedingProblem']}, 
-    {$medicalHistory['cancer']}, {$medicalHistory['hivAids']}, {$medicalHistory['jawPain']}, 
-    {$medicalHistory['kidneyDisease']}, {$medicalHistory['liverDisease']}, {$medicalHistory['osteoporosis']}, 
-    {$medicalHistory['psychiatricTreatment']}, {$medicalHistory['respiratoryDisease']}, 
-    {$allergies['localAnesthetic']}, {$allergies['nsaid']}, {$allergies['penicillin']}, {$allergies['latex']}, '{$allergies['others']}'
-)";
+        INSERT INTO patient_records (
+            name, age, sex, patient_id, email, phone, address, reason, serious_illness, 
+            bad_breath, bleeding_gums, clicking_jaw, food_collecting, grinding_teeth, loose_teeth, pain, 
+            sensitivity_cold, sensitivity_hot, sensitivity_sweets, sores_mouth, swelling, reaction_anesthetic, 
+            pregnant, birth_control, nursing, anemia, arthritis, artificial_devices, asthma, autoimmune, 
+            bleeding_problem, cancer, hiv_aids, jaw_pain, kidney_disease, liver_disease, osteoporosis, 
+            psychiatric_treatment, respiratory_disease, local_anesthetic, nsaid, penicillin, latex, others
+        ) VALUES (
+            '$name', $age, '$sex', '$patientid', '$email', '$phone', '$address', '$reason', '$seriousIllness',
+            {$dentalHistory['badBreath']}, {$dentalHistory['bleedingGums']}, {$dentalHistory['clickingJaw']}, 
+            {$dentalHistory['foodCollecting']}, {$dentalHistory['grindingTeeth']}, {$dentalHistory['looseTeeth']}, {$dentalHistory['pain']}, 
+            {$dentalHistory['sensitivityCold']}, {$dentalHistory['sensitivityHot']}, {$dentalHistory['sensitivitySweets']}, 
+            {$dentalHistory['soresMouth']}, {$dentalHistory['swelling']}, {$dentalHistory['reactionAnesthetic']}, 
+            {$medicalHistory['pregnant']}, {$medicalHistory['birthControl']}, {$medicalHistory['nursing']}, 
+            {$medicalHistory['anemia']}, {$medicalHistory['arthritis']}, {$medicalHistory['artificialDevices']}, 
+            {$medicalHistory['asthma']}, {$medicalHistory['autoimmune']}, {$medicalHistory['bleedingProblem']}, 
+            {$medicalHistory['cancer']}, {$medicalHistory['hivAids']}, {$medicalHistory['jawPain']}, 
+            {$medicalHistory['kidneyDisease']}, {$medicalHistory['liverDisease']}, {$medicalHistory['osteoporosis']}, 
+            {$medicalHistory['psychiatricTreatment']}, {$medicalHistory['respiratoryDisease']}, 
+            {$allergies['localAnesthetic']}, {$allergies['nsaid']}, {$allergies['penicillin']}, {$allergies['latex']}, '{$allergies['others']}'
+        )";
 
         // Execute query
-        if ($conn->query($sql) === TRUE) {
-            // echo "New record created successfully.";
+        if ($conn->query($sql) == TRUE) {
+            echo "New record created successfully.";
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
@@ -228,7 +233,8 @@ INSERT INTO patient_records (
                             id="name"
                             name="name"
                             class="form-control"
-                            placeholder="Enter name" />
+                            placeholder="Enter name"
+                            value="<?php echo $formData['name'] ?? ''; ?>" />
                     </div>
                     <div class="col-md-6">
                         <div class="row">
@@ -240,14 +246,15 @@ INSERT INTO patient_records (
                                     required
                                     name="age"
                                     class="form-control"
-                                    placeholder="Enter age" />
+                                    placeholder="Enter age"
+                                    value="<?php echo $formData['age'] ?? ''; ?>" />
                             </div>
                             <div class="col-md-6">
                                 <label for="sex" class="form-label">Sex<span style="color:red;"> * </span></label>
                                 <select class="form-select" name="sex" id="" required>
                                     <option value="#" selected hidden>Please Select Sex</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
+                                    <option value="Male" <?php echo isset($formData['sex']) && $formData['sex'] == 'Male' ? 'selected' : ''; ?>>Male</option>
+                                    <option value="Female" <?php echo isset($formData['sex']) && $formData['sex'] == 'Female' ? 'selected' : ''; ?>>Female</option>
                                 </select>
                             </div>
                         </div>
@@ -265,7 +272,11 @@ INSERT INTO patient_records (
                                     readonly
                                     name="patientId"
                                     required
-                                    value="<?php echo getPatientId(); ?>"
+                                    value="<?php if (isset($formData['patientId'])) {
+                                                echo htmlspecialchars($formData['patientId']) . '';
+                                            } else {
+                                                echo getPatientId();
+                                            } ?>"
                                     class="form-control"
                                     placeholder="Enter patient ID" />
                             </div>
@@ -277,7 +288,8 @@ INSERT INTO patient_records (
                                     id="email"
                                     name="email"
                                     class="form-control"
-                                    placeholder="Enter email" />
+                                    placeholder="Enter email"
+                                    value="<?php echo $formData['email'] ?? ''; ?>" />
                             </div>
                         </div>
                     </div>
@@ -291,7 +303,8 @@ INSERT INTO patient_records (
                                     id="address"
                                     name="address"
                                     class="form-control"
-                                    placeholder="Enter address" />
+                                    placeholder="Enter address"
+                                    value="<?php echo $formData['address'] ?? ''; ?>" />
                             </div>
                             <div class="col-md-6">
                                 <label for="phone" class="form-label">Phone<span style="color:red;"> * </span></label>
@@ -301,7 +314,8 @@ INSERT INTO patient_records (
                                     id="phone"
                                     name="phone"
                                     class="form-control"
-                                    placeholder="Enter phone" />
+                                    placeholder="Enter phone"
+                                    value="<?php echo $formData['phone'] ?? ''; ?>" />
                             </div>
                         </div>
                     </div>
@@ -310,7 +324,7 @@ INSERT INTO patient_records (
                 <div class="mb-4">
                     <h5 class="fw-bold text-white">DENTAL HISTORY</h5>
                     <label for="reason" class="form-label">Reason for Today's Visit:</label>
-                    <textarea id="reason" name="reason" class="form-control mb-3" rows="2"></textarea>
+                    <textarea id="reason" name="reason" class="form-control mb-3" rows="2"><?php echo $formData['reason'] ?? ''; ?></textarea>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-check">
@@ -318,6 +332,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="badBreath"
+                                    value="on"
+                                    <?php echo isset($formData['badBreath']) && $formData['badBreath'] == "on" ? 'checked' : ''; ?>
                                     name="badBreath" />
                                 <label for="badBreath" class="form-check-label">Bad Breath</label>
                             </div>
@@ -326,7 +342,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="bleedingGums"
-                                    name="bleedingGums" />
+                                    name="bleedingGums"
+                                    <?php echo isset($formData['bleedingGums']) && $formData['bleedingGums'] == "on" ? 'checked' : ''; ?> />
                                 <label for="bleedingGums" class="form-check-label">Bleeding Gums</label>
                             </div>
                             <div class="form-check">
@@ -334,7 +351,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="clickingJaw"
-                                    name="clickingJaw" />
+                                    name="clickingJaw"
+                                    <?php echo isset($formData['clickingJaw']) && $formData['clickingJaw'] == "on" ? 'checked' : ''; ?> />
                                 <label for="clickingJaw" class="form-check-label">Clicking or Popping Jaw</label>
                             </div>
                             <div class="form-check">
@@ -342,7 +360,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="foodCollecting"
-                                    name="foodCollecting" />
+                                    name="foodCollecting"
+                                    <?php echo isset($formData['foodCollecting']) && $formData['foodCollecting'] == "on" ? 'checked' : ''; ?> />
                                 <label for="foodCollecting" class="form-check-label">Food Collecting Between Teeth</label>
                             </div>
                             <div class="form-check">
@@ -350,7 +369,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="grindingTeeth"
-                                    name="grindingTeeth" />
+                                    name="grindingTeeth"
+                                    <?php echo isset($formData['grindingTeeth']) && $formData['grindingTeeth'] == "on" ? 'checked' : ''; ?> />
                                 <label for="grindingTeeth" class="form-check-label">Grinding Teeth</label>
                             </div>
                             <div class="form-check">
@@ -358,11 +378,12 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="looseTeeth"
-                                    name="looseTeeth" />
+                                    name="looseTeeth"
+                                    <?php echo isset($formData['looseTeeth']) && $formData['looseTeeth'] == "on" ? 'checked' : ''; ?> />
                                 <label for="looseTeeth" class="form-check-label">Loose Teeth or Broken Fillings</label>
                             </div>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="pain" name="pain" />
+                                <input type="checkbox" class="form-check-input" id="pain" name="pain" <?php echo isset($formData['pain']) && $formData['pain'] == "on" ? 'checked' : ''; ?> />
                                 <label for="pain" class="form-check-label">Pain</label>
                             </div>
                         </div>
@@ -372,7 +393,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="sensitivityCold"
-                                    name="sensitivityCold" />
+                                    name="sensitivityCold"
+                                    <?php echo isset($formData['sensitivityCold']) && $formData['sensitivityCold'] == "on" ? 'checked' : ''; ?> />
                                 <label for="sensitivityCold" class="form-check-label">Sensitivity to Cold</label>
                             </div>
                             <div class="form-check">
@@ -380,7 +402,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="sensitivityHot"
-                                    name="sensitivityHot" />
+                                    name="sensitivityHot"
+                                    <?php echo isset($formData['sensitivityHot']) && $formData['sensitivityHot'] == "on" ? 'checked' : ''; ?> />
                                 <label for="sensitivityHot" class="form-check-label">Sensitivity to Hot</label>
                             </div>
                             <div class="form-check">
@@ -388,7 +411,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="sensitivitySweets"
-                                    name="sensitivitySweets" />
+                                    name="sensitivitySweets"
+                                    <?php echo isset($formData['sensitivitySweets']) && $formData['sensitivitySweets'] == "on" ? 'checked' : ''; ?> />
                                 <label for="sensitivitySweets" class="form-check-label">Sensitivity to Sweets</label>
                             </div>
                             <div class="form-check">
@@ -396,12 +420,14 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="soresMouth"
-                                    name="soresMouth" />
+                                    name="soresMouth"
+                                    <?php echo isset($formData['soresMouth']) && $formData['soresMouth'] == "on" ? 'checked' : ''; ?> />
                                 <label for="soresMouth" class="form-check-label">Sores or Growths in Mouth</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="swelling"
-                                    name="swelling" />
+                                    name="swelling"
+                                    <?php echo isset($formData['swelling']) && $formData['swelling'] == "on" ? 'checked' : ''; ?> />
                                 <label for="swelling" class="form-check-label">Swelling</label>
                             </div>
                             <div class="form-check">
@@ -409,7 +435,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="reactionAnesthetic"
-                                    name="reactionAnesthetic" />
+                                    name="reactionAnesthetic"
+                                    <?php echo isset($formData['reactionAnesthetic']) && $formData['reactionAnesthetic'] == "on" ? 'checked' : ''; ?> />
                                 <label for="reactionAnesthetic" class="form-check-label">Reaction to Local Anesthetics</label>
                             </div>
                         </div>
@@ -424,17 +451,19 @@ INSERT INTO patient_records (
                             id="seriousIllness"
                             class="form-control"
                             name="seriousIllness"
-                            rows="2"></textarea>
+                            rows="2"><?php echo $formData['seriousIllness'] ?? ''; ?></textarea>
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="pregnant" name="pregnant" />
+                                <input type="checkbox" class="form-check-input" id="pregnant" name="pregnant"
+                                    <?php echo isset($formData['pregnant']) && $formData['pregnant'] == "on" ? 'checked' : ''; ?> />
                                 <label for="pregnant" class="form-check-label">Are you Pregnant?</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="nursing"
-                                    name="nursing" />
+                                    name="nursing"
+                                    <?php echo isset($formData['nursing']) && $formData['nursing'] == "on" ? 'checked' : ''; ?> />
                                 <label for="nursing" class="form-check-label">Nursing</label>
                             </div>
                         </div>
@@ -444,7 +473,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="birthControl"
-                                    name="birthControl" />
+                                    name="birthControl"
+                                    <?php echo isset($formData['birthControl']) && $formData['birthControl'] == "on" ? 'checked' : ''; ?> />
                                 <label for="birthControl" class="form-check-label">Taking Birth Control Pills</label>
                             </div>
                         </div>
@@ -458,7 +488,8 @@ INSERT INTO patient_records (
                         <div class="col-md-6">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="anemia"
-                                    name="anemia" />
+                                    name="anemia"
+                                    <?php echo isset($formData['anemia']) && $formData['anemia'] == "on" ? 'checked' : ''; ?> />
                                 <label for="anemia" class="form-check-label">Anemia</label>
                             </div>
                             <div class="form-check">
@@ -466,7 +497,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="arthritis"
-                                    name="arthritis" />
+                                    name="arthritis"
+                                    <?php echo isset($formData['arthritis']) && $formData['arthritis'] == "on" ? 'checked' : ''; ?> />
                                 <label for="arthritis" class="form-check-label">Arthritis, Rheumatism</label>
                             </div>
                             <div class="form-check">
@@ -474,12 +506,14 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="artificialDevices"
-                                    name="artificialDevices" />
+                                    name="artificialDevices"
+                                    <?php echo isset($formData['artificialDevices']) && $formData['artificialDevices'] == "on" ? 'checked' : ''; ?> />
                                 <label for="artificialDevices" class="form-check-label">Artificial Devices or Joints</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="asthma"
-                                    name="asthma" />
+                                    name="asthma"
+                                    <?php echo isset($formData['asthma']) && $formData['asthma'] == "on" ? 'checked' : ''; ?> />
                                 <label for="asthma" class="form-check-label">Asthma</label>
                             </div>
                             <div class="form-check">
@@ -487,7 +521,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="autoimmune"
-                                    name="autoimmune" />
+                                    name="autoimmune"
+                                    <?php echo isset($formData['autoimmune']) && $formData['autoimmune'] == "on" ? 'checked' : ''; ?> />
                                 <label for="autoimmune" class="form-check-label">Autoimmune Condition</label>
                             </div>
                             <div class="form-check">
@@ -495,21 +530,25 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="bleedingProblem"
-                                    name="bleedingProblem" />
+                                    name="bleedingProblem"
+                                    <?php echo isset($formData['bleedingProblem']) && $formData['bleedingProblem'] == "on" ? 'checked' : ''; ?> />
                                 <label for="bleedingProblem" class="form-check-label">Bleeding Problem</label>
                             </div>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="cancer" name="cancer" />
+                                <input type="checkbox" class="form-check-input" id="cancer" name="cancer"
+                                    <?php echo isset($formData['cancer']) && $formData['cancer'] == "on" ? 'checked' : ''; ?> />
                                 <label for="cancer" class="form-check-label">Cancer</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="hivAids" name="hivAids" />
+                                <input type="checkbox" class="form-check-input" id="hivAids" name="hivAids"
+                                    <?php echo isset($formData['hivAids']) && $formData['hivAids'] == "on" ? 'checked' : ''; ?> />
                                 <label for="hivAids" class="form-check-label">HIV/AIDS</label>
                             </div>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="jawPain" name="jawPain" />
+                                <input type="checkbox" class="form-check-input" id="jawPain" name="jawPain"
+                                    <?php echo isset($formData['jawPain']) && $formData['jawPain'] == "on" ? 'checked' : ''; ?> />
                                 <label for="jawPain" class="form-check-label">Jaw Pain</label>
                             </div>
                             <div class="form-check">
@@ -517,7 +556,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="kidneyDisease"
-                                    name="kidneyDisease" />
+                                    name="kidneyDisease"
+                                    <?php echo isset($formData['kidneyDisease']) && $formData['kidneyDisease'] == "on" ? 'checked' : ''; ?> />
                                 <label for="kidneyDisease" class="form-check-label">Kidney Disease</label>
                             </div>
                             <div class="form-check">
@@ -525,7 +565,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="liverDisease"
-                                    name="liverDisease" />
+                                    name="liverDisease"
+                                    <?php echo isset($formData['liverDisease']) && $formData['liverDisease'] == "on" ? 'checked' : ''; ?> />
                                 <label for="liverDisease" class="form-check-label">Liver Disease</label>
                             </div>
                             <div class="form-check">
@@ -533,7 +574,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="osteoporosis"
-                                    name="osteoporosis" />
+                                    name="osteoporosis"
+                                    <?php echo isset($formData['osteoporosis']) && $formData['osteoporosis'] == "on" ? 'checked' : ''; ?> />
                                 <label for="osteoporosis" class="form-check-label">Osteoporosis</label>
                             </div>
                             <div class="form-check">
@@ -541,7 +583,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="psychiatricTreatment"
-                                    name="psychiatricTreatment" />
+                                    name="psychiatricTreatment"
+                                    <?php echo isset($formData['psychiatricTreatment']) && $formData['psychiatricTreatment'] == "on" ? 'checked' : ''; ?> />
                                 <label for="psychiatricTreatment" class="form-check-label">Psychiatric Treatment</label>
                             </div>
                             <div class="form-check">
@@ -549,7 +592,8 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="respiratoryDisease"
-                                    name="respiratoryDisease" />
+                                    name="respiratoryDisease"
+                                    <?php echo isset($formData['respiratoryDisease']) && $formData['respiratoryDisease'] == "on" ? 'checked' : ''; ?> />
                                 <label for="respiratoryDisease" class="form-check-label">Respiratory Disease</label>
                             </div>
                         </div>
@@ -566,11 +610,13 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="localAnesthetic"
-                                    name="localAnesthetic" />
+                                    name="localAnesthetic"
+                                    <?php echo isset($formData['localAnesthetic']) && $formData['localAnesthetic'] == "on" ? 'checked' : ''; ?> />
                                 <label for="localAnesthetic" class="form-check-label">Local Anesthetic</label>
                             </div>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="nsaid" name="nsaid" />
+                                <input type="checkbox" class="form-check-input" id="nsaid" name="nsaid"
+                                    <?php echo isset($formData['nsaid']) && $formData['nsaid'] == "on" ? 'checked' : ''; ?> />
                                 <label for="nsaid" class="form-check-label">NSAID</label>
                             </div>
                             <div class="form-check">
@@ -578,31 +624,123 @@ INSERT INTO patient_records (
                                     type="checkbox"
                                     class="form-check-input"
                                     id="penicillin"
-                                    name="penicillin" />
+                                    name="penicillin"
+                                    <?php echo isset($formData['penicillin']) && $formData['penicillin'] == "on" ? 'checked' : ''; ?> />
                                 <label for="penicillin" class="form-check-label">Penicillin</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="latex" name="latex" />
+                                <input type="checkbox" class="form-check-input" id="latex" name="latex"
+                                    <?php echo isset($formData['latex']) && $formData['latex'] == "on" ? 'checked' : ''; ?> />
                                 <label for="latex" class="form-check-label">Latex</label>
                             </div>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="others" id="others" />
+                                <input type="checkbox" class="form-check-input" name="others" id="others"
+                                    <?php echo isset($formData['others']) && $formData['others'] == "on" ? 'checked' : ''; ?> />
                                 <label for="others" class="form-check-label">Others</label>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div id="teethLink">
+                        <p class="fw-bold text-white my-4">Click here to choose treatment plan : <a id="teethBtn" rel="noopener noreferrer">Click here!</a></p>
+                    </div>
+                    <div id="treatmentPlan" class="my-3 d-none">
+                        <h2 class="text-center text-white">TREATMENT PLAN</h2>
+                        <table class="table table-striped">
+                            <thead>
+                                <td class="text-center">Id</td>
+                                <td class="text-center">Tooth Name</td>
+                                <td class="text-center">Treatment</td>
+                                <td class="text-center">Price</td>
+                            </thead>
+                            <tbody id="treatmentTable">
 
+                            </tbody>
+                        </table>
+                        <div class="d-flex justify-content-end">
+                            <a href="teethMap.php" class="btn btn-primary px-4 py-2">Edit</a>
+                        </div>
+                    </div>
+                </div>
                 <div class="d-flex justify-content-center">
-                    <button type="submit" class="btn btn-primary px-4 py-2">Submit</button>
+                    <button id="submit" name="submit" type="submit" class="btn btn-primary px-4 py-2">Submit</button>
                 </div>
             </form>
         </div>
     </div>
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let selectedTeethData = [];
+            if (localStorage.getItem("selectedTeethData")) {
+                document.getElementById("treatmentPlan").classList.remove("d-none");
+                document.getElementById("teethLink").classList.add("d-none");
+                selectedTeethData = JSON.parse(localStorage.getItem("selectedTeethData"));
+                const treatmentTable = document.getElementById("treatmentTable");
+                selectedTeethData.forEach((item, index) => {
+                    treatmentTable.innerHTML += `
+                      <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td class="text-center">${item.toothId}</td>
+                        <td class="text-center">${item.selectedOptions[1]}</td>
+                        <td class="text-center">${item.selectedOptions[0]}</td>
+                      </tr>
+                    `;
+                });
+            } else {
+                document.getElementById("treatmentPlan").classList.add("d-none");
+                document.getElementById("teethLink").classList.remove("d-none");
+            }
+            let dataToSent = {
+                'selectedTeethData': selectedTeethData,
+                'patient_id': document.getElementById('patient-id').value
+            };
+            console.log(dataToSent);
 
+            document.addEventListener('onsubmit', function(event, dataToSent) {
+                fetch('patientsData.php', {
+                        method: 'POST',
+                        body: selectedTeethData,
+                    }).then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            alert('data send successfully!');
+                            window.location.href = "teethMap.php";
+                        } else {
+                            alert('Error submitting form: ' + data.error);
+                        }
+                    })
+            })
+
+            document.getElementById('teethBtn').addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default link behavior
+
+                // Get the form element
+                const form = document.querySelector('form');
+
+                // Create a FormData object
+                const formData = new FormData(form);
+
+                // Send data using fetch API
+                fetch('storeSession.php', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then((response) => response.json()) // Assuming storeSession.php returns JSON
+                    .then((data) => {
+                        if (data.success) {
+                            alert('Form submitted successfully!');
+                            window.location.href = "teethMap.php";
+                        } else {
+                            alert('Error submitting form: ' + data.error);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting the form.');
+                    });
+            });
+        })
     </script>
 </body>
 

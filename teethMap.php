@@ -292,31 +292,40 @@
           class="teeth"
           style="right: 41.4rem; top: 12.9rem; width: 41px; height: 23px"></div>
       </span>
-      <div>
+      <div class="my-3">
         <h2 class="text-center">TREATMENT PLAN</h2>
-        <table>
-          <tr>
-            <th>Teeth</th>
-            <th>Procedures</th>
-          </tr>
-          <tr>
-            <td>21, 22, 23, 24, 25, 26, 27, 28, 31, 32, 33, 34, 35, 36, 37, 38</td>
+        <table class="table table-striped">
+          <thead>
+            <td class="text-center">Id</td>
+            <td class="text-center">Tooth Name</td>
+            <td class="text-center">Treatment</td>
+            <td class="text-center">Price</td>
+          </thead>
+          <tbody id="treatmentTable">
+
+          </tbody>
         </table>
+        <p id="goBack" class="btn btn-primary px-4 py-2">Go back</p>
       </div>
       <script>
-        //   document.querySelectorAll(".teeth").forEach((tooth) => {
-        //     tooth.addEventListener("click", function () {
-        //       // Reset all divs
-        //       document
-        //         .querySelectorAll(".teeth")
-        //         .forEach((el) => (el.style.background = "transparent"));
-        //       // Highlight the clicked one
-        //       this.style.background = "#bcbcd28c";
-        //       alert(`You clicked on ${this.id}`);
-        //     });
-        //   });
         // Array to store selected teeth data
         document.addEventListener('DOMContentLoaded', async () => {
+          function addToSelectedTeethData(selectedTeethData) {
+            const treatmentTable = document.getElementById("treatmentTable");
+
+            // Clear the table and repopulate it to avoid duplicates
+            treatmentTable.innerHTML = "";
+            selectedTeethData.forEach((item, index) => {
+              treatmentTable.innerHTML += `
+                      <tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td class="text-center">${item.toothId}</td>
+                        <td class="text-center">${item.selectedOptions[1]}</td>
+                        <td class="text-center">${item.selectedOptions[0]}</td>
+                      </tr>
+                    `;
+            });
+          }
           var modalData;
           try {
             modalData = await fetchSurgeryData();
@@ -324,7 +333,9 @@
           } catch (error) {
             console.error('Error fetching surgeries:', error);
           }
-          const selectedTeethData = [];
+          const selectedTeethData = localStorage.getItem('selectedTeethData') ? JSON.parse(localStorage.getItem('selectedTeethData')) : [];
+          addToSelectedTeethData(selectedTeethData);
+          console.log(selectedTeethData);
 
           async function fetchSurgeryData() {
             return new Promise((resolve, reject) => {
@@ -382,6 +393,7 @@
                 `;
               });
 
+
               // Handle form submission
               document.getElementById("submitBtn").onclick = function() {
                 const selectedOptions = [];
@@ -400,17 +412,35 @@
                   }
                 });
 
-                // Push the data into the array
-                selectedTeethData.push({
-                  toothId: toothId,
-                  selectedOptions: selectedOptions,
-                });
+                // Check for duplicates before adding to selectedTeethData
+                const existingEntry = selectedTeethData.find(
+                  (item) =>
+                  item.toothId === toothId &&
+                  item.selectedOptions[0] === selectedOptions[0] && // Price
+                  item.selectedOptions[1] === selectedOptions[1] // Treatment
+                );
 
+                if (!existingEntry) {
+                  // Push the data into the array
+                  selectedTeethData.push({
+                    toothId: toothId,
+                    selectedOptions: selectedOptions,
+                  });
+
+                  addToSelectedTeethData(selectedTeethData);
+
+                } else {
+                  console.log("Duplicate entry detected, not adding.");
+                }
                 // Close the modal
                 modal.hide();
 
                 // Log the selected data to the console
                 console.log(selectedTeethData);
+                document.getElementById("goBack").addEventListener("click", () => {
+                  localStorage.setItem("selectedTeethData", JSON.stringify(selectedTeethData));
+                  window.location.href = "index.php";
+                })
               };
 
             });
