@@ -1,8 +1,8 @@
 <?php
 session_start();
-$formData = $_SESSION['patientData'];
-// session_unset();
-var_dump($formData);
+if (isset($_SESSION['patientData'])) {
+    $formData = $_SESSION['patientData'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -193,7 +193,10 @@ var_dump($formData);
 
         // Execute query
         if ($conn->query($sql) == TRUE) {
-            echo "New record created successfully.";
+            // unset($_SESSION['patientData']);
+            // echo "<script>window.localStorage.removeItem(\"selectedTeethData\");</script>";
+            // echo "<script>window.location.reload();</script>";
+            echo "<script>window.location.href = 'process.php'</script>";
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
@@ -202,7 +205,7 @@ var_dump($formData);
         $conn->close();
     }
     ?>
-    <?php // include("slider.php"); 
+    <?php  include("slider.php"); 
     ?>
     <div id="main">
         <div class="container py-4">
@@ -333,7 +336,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="badBreath"
                                     value="on"
-                                    <?php echo isset($formData['badBreath']) && $formData['badBreath'] == "on" ? 'checked' : ''; ?>
+                                    <?php echo isset($formData["dentalHistory"]['badBreath']) && $formData["dentalHistory"]['badBreath'] == "on" ? 'checked' : ''; ?>
                                     name="badBreath" />
                                 <label for="badBreath" class="form-check-label">Bad Breath</label>
                             </div>
@@ -343,7 +346,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="bleedingGums"
                                     name="bleedingGums"
-                                    <?php echo isset($formData['bleedingGums']) && $formData['bleedingGums'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['bleedingGums']) && $formData["dentalHistory"]['bleedingGums'] == "on" ? 'checked' : ''; ?> />
                                 <label for="bleedingGums" class="form-check-label">Bleeding Gums</label>
                             </div>
                             <div class="form-check">
@@ -352,7 +355,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="clickingJaw"
                                     name="clickingJaw"
-                                    <?php echo isset($formData['clickingJaw']) && $formData['clickingJaw'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['clickingJaw']) && $formData["dentalHistory"]['clickingJaw'] == "on" ? 'checked' : ''; ?> />
                                 <label for="clickingJaw" class="form-check-label">Clicking or Popping Jaw</label>
                             </div>
                             <div class="form-check">
@@ -361,7 +364,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="foodCollecting"
                                     name="foodCollecting"
-                                    <?php echo isset($formData['foodCollecting']) && $formData['foodCollecting'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['foodCollecting']) && $formData["dentalHistory"]['foodCollecting'] == "on" ? 'checked' : ''; ?> />
                                 <label for="foodCollecting" class="form-check-label">Food Collecting Between Teeth</label>
                             </div>
                             <div class="form-check">
@@ -370,7 +373,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="grindingTeeth"
                                     name="grindingTeeth"
-                                    <?php echo isset($formData['grindingTeeth']) && $formData['grindingTeeth'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['grindingTeeth']) && $formData["dentalHistory"]['grindingTeeth'] == "on" ? 'checked' : ''; ?> />
                                 <label for="grindingTeeth" class="form-check-label">Grinding Teeth</label>
                             </div>
                             <div class="form-check">
@@ -379,11 +382,11 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="looseTeeth"
                                     name="looseTeeth"
-                                    <?php echo isset($formData['looseTeeth']) && $formData['looseTeeth'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['looseTeeth']) && $formData["dentalHistory"]['looseTeeth'] == "on" ? 'checked' : ''; ?> />
                                 <label for="looseTeeth" class="form-check-label">Loose Teeth or Broken Fillings</label>
                             </div>
                             <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="pain" name="pain" <?php echo isset($formData['pain']) && $formData['pain'] == "on" ? 'checked' : ''; ?> />
+                                <input type="checkbox" class="form-check-input" id="pain" name="pain" <?php echo isset($formData["dentalHistory"]['pain']) && $formData["dentalHistory"]['pain'] == "on" ? 'checked' : ''; ?> />
                                 <label for="pain" class="form-check-label">Pain</label>
                             </div>
                         </div>
@@ -394,7 +397,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="sensitivityCold"
                                     name="sensitivityCold"
-                                    <?php echo isset($formData['sensitivityCold']) && $formData['sensitivityCold'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['sensitivityCold']) && $formData["dentalHistory"]['sensitivityCold'] == "on" ? 'checked' : ''; ?> />
                                 <label for="sensitivityCold" class="form-check-label">Sensitivity to Cold</label>
                             </div>
                             <div class="form-check">
@@ -403,7 +406,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="sensitivityHot"
                                     name="sensitivityHot"
-                                    <?php echo isset($formData['sensitivityHot']) && $formData['sensitivityHot'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['sensitivityHot']) && $formData["dentalHistory"]['sensitivityHot'] == "on" ? 'checked' : ''; ?> />
                                 <label for="sensitivityHot" class="form-check-label">Sensitivity to Hot</label>
                             </div>
                             <div class="form-check">
@@ -412,7 +415,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="sensitivitySweets"
                                     name="sensitivitySweets"
-                                    <?php echo isset($formData['sensitivitySweets']) && $formData['sensitivitySweets'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['sensitivitySweets']) && $formData["dentalHistory"]['sensitivitySweets'] == "on" ? 'checked' : ''; ?> />
                                 <label for="sensitivitySweets" class="form-check-label">Sensitivity to Sweets</label>
                             </div>
                             <div class="form-check">
@@ -421,13 +424,13 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="soresMouth"
                                     name="soresMouth"
-                                    <?php echo isset($formData['soresMouth']) && $formData['soresMouth'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['soresMouth']) && $formData["dentalHistory"]['soresMouth'] == "on" ? 'checked' : ''; ?> />
                                 <label for="soresMouth" class="form-check-label">Sores or Growths in Mouth</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="swelling"
                                     name="swelling"
-                                    <?php echo isset($formData['swelling']) && $formData['swelling'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['swelling']) && $formData["dentalHistory"]['swelling'] == "on" ? 'checked' : ''; ?> />
                                 <label for="swelling" class="form-check-label">Swelling</label>
                             </div>
                             <div class="form-check">
@@ -436,7 +439,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="reactionAnesthetic"
                                     name="reactionAnesthetic"
-                                    <?php echo isset($formData['reactionAnesthetic']) && $formData['reactionAnesthetic'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["dentalHistory"]['reactionAnesthetic']) && $formData["dentalHistory"]['reactionAnesthetic'] == "on" ? 'checked' : ''; ?> />
                                 <label for="reactionAnesthetic" class="form-check-label">Reaction to Local Anesthetics</label>
                             </div>
                         </div>
@@ -457,13 +460,13 @@ var_dump($formData);
                         <div class="col-md-6">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="pregnant" name="pregnant"
-                                    <?php echo isset($formData['pregnant']) && $formData['pregnant'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['pregnant']) && $formData["medicalHistory"]['pregnant'] == "on" ? 'checked' : ''; ?> />
                                 <label for="pregnant" class="form-check-label">Are you Pregnant?</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="nursing"
                                     name="nursing"
-                                    <?php echo isset($formData['nursing']) && $formData['nursing'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['nursing']) && $formData["medicalHistory"]['nursing'] == "on" ? 'checked' : ''; ?> />
                                 <label for="nursing" class="form-check-label">Nursing</label>
                             </div>
                         </div>
@@ -474,7 +477,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="birthControl"
                                     name="birthControl"
-                                    <?php echo isset($formData['birthControl']) && $formData['birthControl'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['birthControl']) && $formData["medicalHistory"]['birthControl'] == "on" ? 'checked' : ''; ?> />
                                 <label for="birthControl" class="form-check-label">Taking Birth Control Pills</label>
                             </div>
                         </div>
@@ -489,7 +492,7 @@ var_dump($formData);
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="anemia"
                                     name="anemia"
-                                    <?php echo isset($formData['anemia']) && $formData['anemia'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['anemia']) && $formData["medicalHistory"]['anemia'] == "on" ? 'checked' : ''; ?> />
                                 <label for="anemia" class="form-check-label">Anemia</label>
                             </div>
                             <div class="form-check">
@@ -498,7 +501,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="arthritis"
                                     name="arthritis"
-                                    <?php echo isset($formData['arthritis']) && $formData['arthritis'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['arthritis']) && $formData["medicalHistory"]['arthritis'] == "on" ? 'checked' : ''; ?> />
                                 <label for="arthritis" class="form-check-label">Arthritis, Rheumatism</label>
                             </div>
                             <div class="form-check">
@@ -507,13 +510,13 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="artificialDevices"
                                     name="artificialDevices"
-                                    <?php echo isset($formData['artificialDevices']) && $formData['artificialDevices'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['artificialDevices']) && $formData["medicalHistory"]['artificialDevices'] == "on" ? 'checked' : ''; ?> />
                                 <label for="artificialDevices" class="form-check-label">Artificial Devices or Joints</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="asthma"
                                     name="asthma"
-                                    <?php echo isset($formData['asthma']) && $formData['asthma'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['asthma']) && $formData["medicalHistory"]['asthma'] == "on" ? 'checked' : ''; ?> />
                                 <label for="asthma" class="form-check-label">Asthma</label>
                             </div>
                             <div class="form-check">
@@ -522,7 +525,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="autoimmune"
                                     name="autoimmune"
-                                    <?php echo isset($formData['autoimmune']) && $formData['autoimmune'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['autoimmune']) && $formData["medicalHistory"]['autoimmune'] == "on" ? 'checked' : ''; ?> />
                                 <label for="autoimmune" class="form-check-label">Autoimmune Condition</label>
                             </div>
                             <div class="form-check">
@@ -531,24 +534,24 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="bleedingProblem"
                                     name="bleedingProblem"
-                                    <?php echo isset($formData['bleedingProblem']) && $formData['bleedingProblem'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['bleedingProblem']) && $formData["medicalHistory"]['bleedingProblem'] == "on" ? 'checked' : ''; ?> />
                                 <label for="bleedingProblem" class="form-check-label">Bleeding Problem</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="cancer" name="cancer"
-                                    <?php echo isset($formData['cancer']) && $formData['cancer'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['cancer']) && $formData["medicalHistory"]['cancer'] == "on" ? 'checked' : ''; ?> />
                                 <label for="cancer" class="form-check-label">Cancer</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="hivAids" name="hivAids"
-                                    <?php echo isset($formData['hivAids']) && $formData['hivAids'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['hivAids']) && $formData["medicalHistory"]['hivAids'] == "on" ? 'checked' : ''; ?> />
                                 <label for="hivAids" class="form-check-label">HIV/AIDS</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="jawPain" name="jawPain"
-                                    <?php echo isset($formData['jawPain']) && $formData['jawPain'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['jawPain']) && $formData["medicalHistory"]['jawPain'] == "on" ? 'checked' : ''; ?> />
                                 <label for="jawPain" class="form-check-label">Jaw Pain</label>
                             </div>
                             <div class="form-check">
@@ -557,7 +560,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="kidneyDisease"
                                     name="kidneyDisease"
-                                    <?php echo isset($formData['kidneyDisease']) && $formData['kidneyDisease'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['kidneyDisease']) && $formData["medicalHistory"]['kidneyDisease'] == "on" ? 'checked' : ''; ?> />
                                 <label for="kidneyDisease" class="form-check-label">Kidney Disease</label>
                             </div>
                             <div class="form-check">
@@ -566,7 +569,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="liverDisease"
                                     name="liverDisease"
-                                    <?php echo isset($formData['liverDisease']) && $formData['liverDisease'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['liverDisease']) && $formData["medicalHistory"]['liverDisease'] == "on" ? 'checked' : ''; ?> />
                                 <label for="liverDisease" class="form-check-label">Liver Disease</label>
                             </div>
                             <div class="form-check">
@@ -575,7 +578,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="osteoporosis"
                                     name="osteoporosis"
-                                    <?php echo isset($formData['osteoporosis']) && $formData['osteoporosis'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['osteoporosis']) && $formData["medicalHistory"]['osteoporosis'] == "on" ? 'checked' : ''; ?> />
                                 <label for="osteoporosis" class="form-check-label">Osteoporosis</label>
                             </div>
                             <div class="form-check">
@@ -584,7 +587,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="psychiatricTreatment"
                                     name="psychiatricTreatment"
-                                    <?php echo isset($formData['psychiatricTreatment']) && $formData['psychiatricTreatment'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['psychiatricTreatment']) && $formData["medicalHistory"]['psychiatricTreatment'] == "on" ? 'checked' : ''; ?> />
                                 <label for="psychiatricTreatment" class="form-check-label">Psychiatric Treatment</label>
                             </div>
                             <div class="form-check">
@@ -593,7 +596,7 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="respiratoryDisease"
                                     name="respiratoryDisease"
-                                    <?php echo isset($formData['respiratoryDisease']) && $formData['respiratoryDisease'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["medicalHistory"]['respiratoryDisease']) && $formData["medicalHistory"]['respiratoryDisease'] == "on" ? 'checked' : ''; ?> />
                                 <label for="respiratoryDisease" class="form-check-label">Respiratory Disease</label>
                             </div>
                         </div>
@@ -611,12 +614,12 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="localAnesthetic"
                                     name="localAnesthetic"
-                                    <?php echo isset($formData['localAnesthetic']) && $formData['localAnesthetic'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["allergies"]['localAnesthetic']) && $formData["allergies"]['localAnesthetic'] == "on" ? 'checked' : ''; ?> />
                                 <label for="localAnesthetic" class="form-check-label">Local Anesthetic</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="nsaid" name="nsaid"
-                                    <?php echo isset($formData['nsaid']) && $formData['nsaid'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["allergies"]['nsaid']) && $formData["allergies"]['nsaid'] == "on" ? 'checked' : ''; ?> />
                                 <label for="nsaid" class="form-check-label">NSAID</label>
                             </div>
                             <div class="form-check">
@@ -625,25 +628,25 @@ var_dump($formData);
                                     class="form-check-input"
                                     id="penicillin"
                                     name="penicillin"
-                                    <?php echo isset($formData['penicillin']) && $formData['penicillin'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["allergies"]['penicillin']) && $formData["allergies"]['penicillin'] == "on" ? 'checked' : ''; ?> />
                                 <label for="penicillin" class="form-check-label">Penicillin</label>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="latex" name="latex"
-                                    <?php echo isset($formData['latex']) && $formData['latex'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["allergies"]['latex']) && $formData["allergies"]['latex'] == "on" ? 'checked' : ''; ?> />
                                 <label for="latex" class="form-check-label">Latex</label>
                             </div>
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" name="others" id="others"
-                                    <?php echo isset($formData['others']) && $formData['others'] == "on" ? 'checked' : ''; ?> />
+                                    <?php echo isset($formData["allergies"]['others']) && $formData["allergies"]['others'] == "on" ? 'checked' : ''; ?> />
                                 <label for="others" class="form-check-label">Others</label>
                             </div>
                         </div>
                     </div>
                     <div id="teethLink">
-                        <p class="fw-bold text-white my-4">Click here to choose treatment plan : <a id="teethBtn" rel="noopener noreferrer">Click here!</a></p>
+                        <p class="fw-bold text-white my-4">Click here to choose treatment plan : <a id="teethBtn" class="text-underline" rel="noopener noreferrer">Click here!</a></p>
                     </div>
                     <div id="treatmentPlan" class="my-3 d-none">
                         <h2 class="text-center text-white">TREATMENT PLAN</h2>
@@ -697,20 +700,20 @@ var_dump($formData);
             };
             console.log(dataToSent);
 
-            document.addEventListener('onsubmit', function(event, dataToSent) {
-                fetch('patientsData.php', {
-                        method: 'POST',
-                        body: selectedTeethData,
-                    }).then((response) => response.json())
-                    .then((data) => {
-                        if (data.success) {
-                            alert('data send successfully!');
-                            window.location.href = "teethMap.php";
-                        } else {
-                            alert('Error submitting form: ' + data.error);
-                        }
-                    })
-            })
+            // document.addEventListener('onsubmit', function(event, dataToSent) {
+            //     fetch('patientsData.php', {
+            //             method: 'POST',
+            //             body: selectedTeethData,
+            //         }).then((response) => response.json())
+            //         .then((data) => {
+            //             if (data.success) {
+            //                 alert('data send successfully!');
+            //                 window.location.href = "teethMap.php";
+            //             } else {
+            //                 alert('Error submitting form: ' + data.error);
+            //             }
+            //         })
+            // })
 
             document.getElementById('teethBtn').addEventListener('click', function(event) {
                 event.preventDefault(); // Prevent the default link behavior

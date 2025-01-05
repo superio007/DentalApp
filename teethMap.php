@@ -310,6 +310,11 @@
       <script>
         // Array to store selected teeth data
         document.addEventListener('DOMContentLoaded', async () => {
+          document.getElementById("goBack").addEventListener("click", () => {
+            localStorage.setItem("selectedTeethData", JSON.stringify(selectedTeethData));
+            window.location.href = "index.php";
+          })
+
           function addToSelectedTeethData(selectedTeethData) {
             const treatmentTable = document.getElementById("treatmentTable");
 
@@ -397,6 +402,7 @@
               // Handle form submission
               document.getElementById("submitBtn").onclick = function() {
                 const selectedOptions = [];
+                // console.log(selectedOptions);
                 const checkboxes = form.querySelectorAll(".form-check-input");
 
                 checkboxes.forEach((checkbox, index) => {
@@ -412,6 +418,7 @@
                   }
                 });
 
+
                 // Check for duplicates before adding to selectedTeethData
                 const existingEntry = selectedTeethData.find(
                   (item) =>
@@ -419,6 +426,7 @@
                   item.selectedOptions[0] === selectedOptions[0] && // Price
                   item.selectedOptions[1] === selectedOptions[1] // Treatment
                 );
+
 
                 if (!existingEntry) {
                   // Push the data into the array
@@ -437,10 +445,7 @@
 
                 // Log the selected data to the console
                 console.log(selectedTeethData);
-                document.getElementById("goBack").addEventListener("click", () => {
-                  localStorage.setItem("selectedTeethData", JSON.stringify(selectedTeethData));
-                  window.location.href = "index.php";
-                })
+                // console.log(count(selectedTeethData));
               };
 
             });

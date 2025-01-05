@@ -1,32 +1,24 @@
 <?php
+session_start();
 require_once('vendor/tecnickcom/tcpdf/tcpdf.php');
 
-// Create new PDF document
-$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+function getFormattedDate($date = null) {
+    return $date ? date('d F Y', strtotime($date)) : date('d F Y');
+}
 
-// Disable default header and footer
-$pdf->setPrintHeader(false);
-$pdf->setPrintFooter(false);
+// Check session or default data
+$formData = $_SESSION['patientData'] ?? [
+    'name' => 'Omprakash Rai',
+    'sex' => 'Male',
+    'age' => 40,
+    'patientId' => 'T24072',
+    'address' => '123 Sample Address, City, State'
+];
+$gender = ($formData['sex'] == 'Male') ? 'M' : 'F';
 
-// Set document information
-$pdf->SetCreator(PDF_CREATOR);
-$pdf->SetAuthor('Shree Sai Dental Lounge');
-$pdf->SetTitle('Invoice');
-$pdf->SetSubject('Invoice');
+// Dynamic Data
 
-// Set margins
-$pdf->SetMargins(15, 27, 15);
-
-// Set auto page breaks
-$pdf->SetAutoPageBreak(true, 10);
-
-// Add a page
-$pdf->AddPage();
-
-// Use Unicode font
-$pdf->SetFont('dejavusans', '', 12);
-
-// Dynamic Data (Example Array)
+    $treatmentData = $_SESSION['TreatmentData'];
 $invoiceData = [
     'clinic' => [
         'name' => 'Shree Sai Dental Lounge',
@@ -36,25 +28,37 @@ $invoiceData = [
         'address' => 'Next to Shastri Nagar Naka, Pokharan Rd no 1, Shastri Nagar, Thane west 400606'
     ],
     'billTo' => [
-        'name' => 'Omprakash Rai',
-        'age_sex' => '40/M',
-        'patient_id' => 'T24072',
-        'address' => '123 Sample Address, City, State'
-    ],
-    'treatment' => [
-        'treatment_name' => 'Root Canal Treatment c 46',
-        'date' => 'December 16, 2024'
-    ],
-    'table_data' => [
-        ['date' => 'Oct 23, 2024', 'tooth_no' => '24 25', 'work_done' => 'Root Canal Treatment', 'amount' => 4000, 'payment' => 1500, 'balance' => 2500],
-        ['date' => 'Oct 26, 2024', 'tooth_no' => '24 25', 'work_done' => 'Zirconia', 'amount' => 9000, 'payment' => 4500, 'balance' => 4500]
-    ],
-    'remittance' => [
-        'amount_due' => 7000
+        'name' => $formData['name'],
+        'age_sex' => "{$formData['age']}/$gender",
+        'patient_id' => $formData['patientId'],
+        'address' => $formData['address']
     ]
 ];
 
-// Create the HTML for the Invoice
+// Calculate total and generate table rows
+$total = 0;
+$tableRows = '';
+foreach ($treatmentData as $row) {
+    if (is_numeric($row['selectedOptions'][0])) {
+        $total += $row['selectedOptions'][0];
+    }
+    $tableRows .= '<tr>
+        <td>' . getFormattedDate() . '</td>
+        <td>' . $row['toothId'] . '</td>
+        <td>₹ ' . $row['selectedOptions'][0] . '</td>
+    </tr>';
+}
+
+// Initialize TCPDF
+$pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+$pdf->setPrintHeader(false);
+$pdf->setPrintFooter(false);
+$pdf->SetMargins(15, 27, 15);
+$pdf->SetAutoPageBreak(true, 10);
+$pdf->AddPage();
+$pdf->SetFont('dejavusans', '', 12);
+
+// Generate HTML
 $html = '
 <style>
     table { border-collapse: collapse; width: 100%; }
@@ -72,15 +76,15 @@ $html = '
 
 <h3>TREATMENT</h3>
 <p>
-    <strong>Treatment Done #:</strong> ' . $invoiceData['treatment']['treatment_name'] . '<br>
-    <strong>Date:</strong> ' . $invoiceData['treatment']['date'] . '
+    <strong>Treatment Done:</strong> Dental Implants, Fluoride Treatments<br>
+    <strong>Date:</strong> ' . getFormattedDate() . '
 </p>
 
 <h3>BILL TO:</h3>
 <p>
-    <strong>Name #:</strong> ' . $invoiceData['billTo']['name'] . '<br>
-    <strong>Age/Sex #:</strong> ' . $invoiceData['billTo']['age_sex'] . '<br>
-    <strong>Patient ID #:</strong> ' . $invoiceData['billTo']['patient_id'] . '<br>
+    <strong>Name:</strong> ' . $invoiceData['billTo']['name'] . '<br>
+    <strong>Age/Sex:</strong> ' . $invoiceData['billTo']['age_sex'] . '<br>
+    <strong>Patient ID:</strong> ' . $invoiceData['billTo']['patient_id'] . '<br>
     <strong>Address:</strong> ' . $invoiceData['billTo']['address'] . '
 </p>
 
@@ -88,42 +92,32 @@ $html = '
     <tr>
         <th>Date</th>
         <th>Tooth No.</th>
-        <th>Work Done #</th>
         <th>Amount</th>
-        <th>Payment</th>
-        <th>Balance</th>
-    </tr>';
+    </tr>
+    ' . $tableRows . '
+</table>
 
-// Add Table Rows
-foreach ($invoiceData['table_data'] as $row) {
-    $html .= '<tr>
-        <td>' . $row['date'] . '</td>
-        <td>' . $row['tooth_no'] . '</td>
-        <td>' . $row['work_done'] . '</td>
-        <td>₹ ' . number_format($row['amount'], 2) . '</td>
-        <td>₹ ' . number_format($row['payment'], 2) . '</td>
-        <td>₹ ' . number_format($row['balance'], 2) . '</td>
-    </tr>';
-}
-
-$html .= '</table>
-<p><strong>Total:</strong> ₹ ' . number_format($invoiceData['remittance']['amount_due'], 2) . '</p>
-
-<h3>REMITTANCE</h3>
-<p>
-    <strong>Patient Name:</strong> ' . $invoiceData['billTo']['name'] . '<br>
-    <strong>Age/Sex:</strong> ' . $invoiceData['billTo']['age_sex'] . '<br>
-    <strong>Patient ID:</strong> ' . $invoiceData['billTo']['patient_id'] . '<br>
-    <strong>Treatment #:</strong> ' . $invoiceData['treatment']['treatment_name'] . '<br>
-    <strong>Date:</strong> ' . $invoiceData['treatment']['date'] . '<br>
-    <strong>Amount Due:</strong> ₹ ' . number_format($invoiceData['remittance']['amount_due'], 2) . '
-</p>
-
+<p><strong>Total:</strong> ₹ ' . number_format($total, 2) . '</p>
 <p style="text-align:center; font-size:16px;">Thank you!!</p>
 ';
 
-// Write HTML content to the PDF
+// Write HTML content to PDF
 $pdf->writeHTML($html, true, false, true, false, '');
 
-// Output the PDF as a file download
-$pdf->Output('invoice.pdf', 'I');
+// Output PDF
+$pdfOutput = $pdf->Output('invoice.pdf', 'S'); // Save the PDF to a string
+file_put_contents('invoice.pdf', $pdfOutput); // Save the PDF to a file on the server
+
+// Send the file for download
+header('Content-Type: application/pdf');
+header('Content-Disposition: attachment; filename="invoice.pdf"');
+header('Content-Length: ' . filesize('invoice.pdf'));
+readfile('invoice.pdf');
+
+// Clean up the file after download
+unlink('invoice.pdf');
+
+// Redirect to the index page
+header('Location: index.php');
+exit();
+
