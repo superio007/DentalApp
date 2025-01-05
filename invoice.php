@@ -110,7 +110,7 @@ file_put_contents('invoice.pdf', $pdfOutput); // Save the PDF to a file on the s
 
 // Send the file for download
 header('Content-Type: application/pdf');
-header('Content-Disposition: attachment; filename="invoice.pdf"');
+header('Content-Disposition: attachment; filename="'. $invoiceData['billTo']['name'] . '.pdf"');
 header('Content-Length: ' . filesize('invoice.pdf'));
 readfile('invoice.pdf');
 
@@ -119,5 +119,6 @@ unlink('invoice.pdf');
 
 // Redirect to the index page
 header('Location: index.php');
+unset($_SESSION['patientData']);
 exit();
 

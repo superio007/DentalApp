@@ -38,7 +38,7 @@
                     window.location.href = 'invoice.php';
                     setTimeout(() => {
                         window.location.href = 'index.php';
-                        // localStorage.removeItem('selectedTeethData');
+                        localStorage.removeItem('selectedTeethData');
                     }, 2000);
                 } else {
                     alert('Failed to save patient data in session.');
