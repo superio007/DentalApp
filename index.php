@@ -206,6 +206,7 @@ if (isset($_SESSION['patientData'])) {
     }
     ?>
     <?php  include("slider.php"); 
+    include("navbar.php");
     ?>
     <div id="main">
         <div class="container py-4">
