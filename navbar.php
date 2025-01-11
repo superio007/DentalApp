@@ -17,18 +17,18 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light px-4">
-        <a class="navbar-brand" href="index.php">Dental Buddy</a>
+    <nav style="background-color: #2e4a71;" class="navbar navbar-expand-lg px-4">
+        <a class="navbar-brand text-white" style="font-size: 24px;font-weight: bold" href="index.php">Dental Buddy</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse d-md-flex justify-content-center" id="navbarNav">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav gap-4">
                 <li class="nav-item active">
-                    <a class="nav-link" href="index.php">Home</a>
+                    <a class="nav-link text-white" style="font-size: 18px;font-weight: bold" href="index.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="tables.php">Tables</a>
+                    <a class="nav-link text-white " style="font-size: 18px;font-weight: bold" href="tables.php">Tables</a>
                 </li>
             </ul>
         </div>
