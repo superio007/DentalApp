@@ -205,7 +205,7 @@ if (isset($_SESSION['patientData'])) {
         $conn->close();
     }
     ?>
-    <?php  include("slider.php"); 
+    <?php include("slider.php");
     include("navbar.php");
     ?>
     <div id="main">
@@ -663,7 +663,11 @@ if (isset($_SESSION['patientData'])) {
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-end">
-                            <a href="teethMap.php" class="btn btn-primary px-4 py-2">Edit</a>
+                            <a href="teethMap.php?patientId=<?php if (isset($formData['patientId'])) {
+                                                                echo htmlspecialchars($formData['patientId']) . '';
+                                                            } else {
+                                                                echo getPatientId();
+                                                            } ?>" class="btn btn-primary px-4 py-2">Edit</a>
                         </div>
                     </div>
                 </div>

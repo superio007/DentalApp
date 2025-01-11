@@ -14,6 +14,9 @@
     rel="stylesheet"
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
     crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="your-custom-script.js"></script>
+
   <style>
     .teeth {
       position: absolute;
@@ -24,6 +27,12 @@
 </head>
 
 <body>
+  <?php
+  if(isset($_GET['patientId'])) {
+    $patientId = $_GET['patientId'];
+  }
+  ?>
+  <input type="text" id="patientId" hidden value="<?php echo $patientId; ?>"/>
   <div id="teeth" class="container">
     <h1 class="text-center">TEETH</h1>
     <div
@@ -312,8 +321,33 @@
         document.addEventListener('DOMContentLoaded', async () => {
           document.getElementById("goBack").addEventListener("click", () => {
             localStorage.setItem("selectedTeethData", JSON.stringify(selectedTeethData));
-            window.location.href = "index.php";
+            
+            // Example usage
+            const dentalData = selectedTeethData;
+            const patientId = document.getElementById('patientId').value;
+            saveDentalData(patientId, dentalData);
+            // window.location.href = "index.php";
           })
+
+          function saveDentalData(patientId, dentalData) {
+            $.ajax({
+              url: 'storeDentalData.php', // Your PHP script
+              method: 'POST',
+              data: {
+                patientId: patientId,
+                dentalData: JSON.stringify(dentalData)
+              },
+              success: function(response) {
+                console.log(response); // Handle the response from the server
+                // alert('Dental data saved successfully!');
+                window.location.href = "index.php";
+              },
+              error: function(xhr, status, error) {
+                console.error('Error:', error);
+                alert('An error occurred while saving the data.');
+              }
+            });
+          }
 
           function addToSelectedTeethData(selectedTeethData) {
             const treatmentTable = document.getElementById("treatmentTable");

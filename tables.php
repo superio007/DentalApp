@@ -71,15 +71,15 @@
                                 const tableRow = `
                                     <tr>
                                         <td class="text-center">${offset + index + 1}</td>
-                                        <td class="text-center">${row.name}</td>
-                                        <td class="text-center">${row.age}</td>
-                                        <td class="text-center">${row.sex}</td>
-                                        <td class="text-center">${row.phone}</td>
+                                        <td class="text-center">${row.name || 'N/A'}</td>
+                                        <td class="text-center">${row.age || 'N/A'}</td>
+                                        <td class="text-center">${row.sex || 'N/A'}</td>
+                                        <td class="text-center">${row.phone || 'N/A'}</td>
                                         <td class="text-center">${row.serious_illness || 'N/A'}</td>
                                         <td class="text-center">Dr Bhavesh</td>
                                         <td class="text-center">${row.reason || 'N/A'}</td>
                                         <td>
-                                            <button class="btn btn-primary">Invoice</button>
+                                            <button class="btn btn-primary invoice" data-patient-id="${row.patient_id}">Invoice</button>
                                         </td>
                                         <td>
                                             <button class="btn btn-primary">Prescription</button>
@@ -117,6 +117,45 @@
                     loadPatientData();
                 }
             });
+
+            // Handle Invoice button click
+            $('table').on('click', '.invoice', function() {
+                const patientId = $(this).data('patient-id');
+                $.ajax({
+                    url: 'fetchAndStorePatientData.php', // PHP script URL
+                    method: 'POST',
+                    data: {
+                        patient_id: patientId
+                    },
+                    success: function(response) {
+                        processPatientData(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while processing the request.');
+                    }
+                });
+            });
+
+            function processPatientData(data) {
+                $.ajax({
+                    url: 'generateInvoiceSession.php', // PHP script URL
+                    method: 'POST',
+                    contentType: 'application/json', // Specify JSON format
+                    data: JSON.stringify(data), // Send data as a JSON string
+                    success: function(response) {
+                        console.log(response); // Log the response
+                        alert('Invoice generated successfully!');
+                        window.location.href = 'GenerateInvoice.php';
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while generating the invoice.');
+                    }
+                });
+            }
+
+
         });
     </script>
 </body>
