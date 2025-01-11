@@ -122,4 +122,5 @@ unlink('invoice.pdf');
 // Redirect to the index page
 header('Location: index.php');
 unset($_SESSION['patientData']);
+unset($_SESSION['dentalData']);
 exit();
