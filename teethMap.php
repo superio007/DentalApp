@@ -15,7 +15,7 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
     crossorigin="anonymous" />
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="your-custom-script.js"></script>
+  <!-- <script src="your-custom-script.js"></script> -->
 
   <style>
     .teeth {
@@ -28,11 +28,11 @@
 
 <body>
   <?php
-  if(isset($_GET['patientId'])) {
+  if (isset($_GET['patientId'])) {
     $patientId = $_GET['patientId'];
   }
   ?>
-  <input type="text" id="patientId" hidden value="<?php echo $patientId; ?>"/>
+  <input type="text" id="patientId" hidden value="<?php echo $patientId; ?>" />
   <div id="teeth" class="container">
     <h1 class="text-center">TEETH</h1>
     <div
@@ -316,46 +316,50 @@
         </table>
         <p id="goBack" class="btn btn-primary px-4 py-2">Go back</p>
       </div>
-      <script>
-        // Array to store selected teeth data
-        document.addEventListener('DOMContentLoaded', async () => {
-          document.getElementById("goBack").addEventListener("click", () => {
-            localStorage.setItem("selectedTeethData", JSON.stringify(selectedTeethData));
-            
-            // Example usage
-            const dentalData = selectedTeethData;
-            const patientId = document.getElementById('patientId').value;
-            saveDentalData(patientId, dentalData);
-            // window.location.href = "index.php";
-          })
 
-          function saveDentalData(patientId, dentalData) {
-            $.ajax({
-              url: 'storeDentalData.php', // Your PHP script
-              method: 'POST',
-              data: {
-                patientId: patientId,
-                dentalData: JSON.stringify(dentalData)
-              },
-              success: function(response) {
-                console.log(response); // Handle the response from the server
-                // alert('Dental data saved successfully!');
-                window.location.href = "index.php";
-              },
-              error: function(xhr, status, error) {
-                console.error('Error:', error);
-                alert('An error occurred while saving the data.');
-              }
-            });
-          }
+    </div>
+  </div>
+</body>
+<script>
+  // Array to store selected teeth data
+  document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById("goBack").addEventListener("click", () => {
+      localStorage.setItem("selectedTeethData", JSON.stringify(selectedTeethData));
 
-          function addToSelectedTeethData(selectedTeethData) {
-            const treatmentTable = document.getElementById("treatmentTable");
+      // Example usage
+      const dentalData = selectedTeethData;
+      const patientId = document.getElementById('patientId').value;
+      saveDentalData(patientId, dentalData);
+      // window.location.href = "index.php";
+    })
 
-            // Clear the table and repopulate it to avoid duplicates
-            treatmentTable.innerHTML = "";
-            selectedTeethData.forEach((item, index) => {
-              treatmentTable.innerHTML += `
+    function saveDentalData(patientId, dentalData) {
+      $.ajax({
+        url: 'storeDentalData.php', // Your PHP script
+        method: 'POST',
+        data: {
+          patientId: patientId,
+          dentalData: JSON.stringify(dentalData)
+        },
+        success: function(response) {
+          console.log(response); // Handle the response from the server
+          // alert('Dental data saved successfully!');
+          window.location.href = "index.php";
+        },
+        error: function(xhr, status, error) {
+          console.error('Error:', error);
+          alert('An error occurred while saving the data.');
+        }
+      });
+    }
+
+    function addToSelectedTeethData(selectedTeethData) {
+      const treatmentTable = document.getElementById("treatmentTable");
+
+      // Clear the table and repopulate it to avoid duplicates
+      treatmentTable.innerHTML = "";
+      selectedTeethData.forEach((item, index) => {
+        treatmentTable.innerHTML += `
                       <tr>
                         <td class="text-center">${index + 1}</td>
                         <td class="text-center">${item.toothId}</td>
@@ -363,66 +367,66 @@
                         <td class="text-center">${item.selectedOptions[0]}</td>
                       </tr>
                     `;
-            });
+      });
+    }
+    var modalData;
+    try {
+      modalData = await fetchSurgeryData();
+      // console.log(modalData);
+    } catch (error) {
+      console.error('Error fetching surgeries:', error);
+    }
+    const selectedTeethData = localStorage.getItem('selectedTeethData') ? JSON.parse(localStorage.getItem('selectedTeethData')) : [];
+    addToSelectedTeethData(selectedTeethData);
+    console.log(selectedTeethData);
+
+    async function fetchSurgeryData() {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", "getSurgeries.php", true);
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              const response = JSON.parse(xhr.responseText);
+              if (response.success) {
+                resolve(response.data);
+              } else {
+                reject("Error fetching surgeries.");
+              }
+            } else {
+              reject("Error fetching surgeries.");
+            }
           }
-          var modalData;
-          try {
-            modalData = await fetchSurgeryData();
-            // console.log(modalData);
-          } catch (error) {
-            console.error('Error fetching surgeries:', error);
-          }
-          const selectedTeethData = localStorage.getItem('selectedTeethData') ? JSON.parse(localStorage.getItem('selectedTeethData')) : [];
-          addToSelectedTeethData(selectedTeethData);
-          console.log(selectedTeethData);
-
-          async function fetchSurgeryData() {
-            return new Promise((resolve, reject) => {
-              const xhr = new XMLHttpRequest();
-              xhr.open("GET", "getSurgeries.php", true);
-              xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                  if (xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                      resolve(response.data);
-                    } else {
-                      reject("Error fetching surgeries.");
-                    }
-                  } else {
-                    reject("Error fetching surgeries.");
-                  }
-                }
-              };
-              xhr.send();
-            });
-          }
+        };
+        xhr.send();
+      });
+    }
 
 
 
-          // Add event listeners to all teeth divs
-          document.querySelectorAll(".teeth").forEach((tooth) => {
-            tooth.addEventListener("click", function() {
-              const toothId = this.id;
-              // Highlight the clicked one
-              document
-                .querySelectorAll(".teeth")
-                .forEach((el) => (el.style.background = "transparent"));
-              this.style.background = "#bcbcd28c";
+    // Add event listeners to all teeth divs
+    document.querySelectorAll(".teeth").forEach((tooth) => {
+      tooth.addEventListener("click", function() {
+        const toothId = this.id;
+        // Highlight the clicked one
+        document
+          .querySelectorAll(".teeth")
+          .forEach((el) => (el.style.background = "transparent"));
+        this.style.background = "#bcbcd28c";
 
-              // Open the modal
-              const modal = new bootstrap.Modal(document.getElementById("toothModal"));
-              modal.show();
+        // Open the modal
+        const modal = new bootstrap.Modal(document.getElementById("toothModal"));
+        modal.show();
 
-              // Inject checkboxes for the selected tooth
-              const form = document.getElementById("toothForm");
-              // Clear previous checkboxes before injecting new ones
-              form.innerHTML = "";
+        // Inject checkboxes for the selected tooth
+        const form = document.getElementById("toothForm");
+        // Clear previous checkboxes before injecting new ones
+        form.innerHTML = "";
 
-              // Loop through modalData and create checkboxes dynamically
-              modalData.forEach((item, index) => {
-                // console.log(item);
-                form.innerHTML += `
+        // Loop through modalData and create checkboxes dynamically
+        modalData.forEach((item, index) => {
+          // console.log(item);
+          form.innerHTML += `
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" value="${item.price || 'N/A'}" id="checkbox-${index + 1}" />
                     <label class="form-check-label" for="checkbox-${index + 1}">
@@ -430,64 +434,61 @@
                     </label>
                   </div>
                 `;
-              });
-
-
-              // Handle form submission
-              document.getElementById("submitBtn").onclick = function() {
-                const selectedOptions = [];
-                // console.log(selectedOptions);
-                const checkboxes = form.querySelectorAll(".form-check-input");
-
-                checkboxes.forEach((checkbox, index) => {
-                  if (checkbox.checked) {
-                    // Add checkbox value
-                    selectedOptions.push(checkbox.value);
-
-                    // Add the corresponding label text content
-                    const label = form.querySelectorAll(".form-check-label")[index];
-                    if (label) {
-                      selectedOptions.push(label.textContent.trim()); // Add the label text
-                    }
-                  }
-                });
-
-
-                // Check for duplicates before adding to selectedTeethData
-                const existingEntry = selectedTeethData.find(
-                  (item) =>
-                  item.toothId === toothId &&
-                  item.selectedOptions[0] === selectedOptions[0] && // Price
-                  item.selectedOptions[1] === selectedOptions[1] // Treatment
-                );
-
-
-                if (!existingEntry) {
-                  // Push the data into the array
-                  selectedTeethData.push({
-                    toothId: toothId,
-                    selectedOptions: selectedOptions,
-                  });
-
-                  addToSelectedTeethData(selectedTeethData);
-
-                } else {
-                  console.log("Duplicate entry detected, not adding.");
-                }
-                // Close the modal
-                modal.hide();
-
-                // Log the selected data to the console
-                console.log(selectedTeethData);
-                // console.log(count(selectedTeethData));
-              };
-
-            });
-          });
         });
-      </script>
-    </div>
-  </div>
-</body>
+
+
+        // Handle form submission
+        document.getElementById("submitBtn").onclick = function() {
+          const selectedOptions = [];
+          // console.log(selectedOptions);
+          const checkboxes = form.querySelectorAll(".form-check-input");
+
+          checkboxes.forEach((checkbox, index) => {
+            if (checkbox.checked) {
+              // Add checkbox value
+              selectedOptions.push(checkbox.value);
+
+              // Add the corresponding label text content
+              const label = form.querySelectorAll(".form-check-label")[index];
+              if (label) {
+                selectedOptions.push(label.textContent.trim()); // Add the label text
+              }
+            }
+          });
+
+
+          // Check for duplicates before adding to selectedTeethData
+          const existingEntry = selectedTeethData.find(
+            (item) =>
+            item.toothId === toothId &&
+            item.selectedOptions[0] === selectedOptions[0] && // Price
+            item.selectedOptions[1] === selectedOptions[1] // Treatment
+          );
+
+
+          if (!existingEntry) {
+            // Push the data into the array
+            selectedTeethData.push({
+              toothId: toothId,
+              selectedOptions: selectedOptions,
+            });
+
+            addToSelectedTeethData(selectedTeethData);
+
+          } else {
+            console.log("Duplicate entry detected, not adding.");
+          }
+          // Close the modal
+          modal.hide();
+
+          // Log the selected data to the console
+          console.log(selectedTeethData);
+          // console.log(count(selectedTeethData));
+        };
+
+      });
+    });
+  });
+</script>
 
 </html>

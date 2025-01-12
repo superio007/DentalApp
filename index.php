@@ -196,7 +196,10 @@ if (isset($_SESSION['patientData'])) {
             // unset($_SESSION['patientData']);
             // echo "<script>window.localStorage.removeItem(\"selectedTeethData\");</script>";
             // echo "<script>window.location.reload();</script>";
-            echo "<script>window.location.href = 'process.php'</script>";
+            // echo "<script>window.location.href = 'process.php'</script>";
+            echo "<script>window.reload();'</script>";
+            echo "<script>localStorage.removeItem('selectedTeethData');</script>";
+            unset($formData);
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
@@ -649,6 +652,13 @@ if (isset($_SESSION['patientData'])) {
                     <div id="teethLink">
                         <p class="fw-bold text-white my-4">Click here to choose treatment plan : <a id="teethBtn" class="text-underline" rel="noopener noreferrer">Click here!</a></p>
                     </div>
+                    <div id="Pescription">
+                        <p class="fw-bold text-white my-4">Click here to write Pescription : <a id="prescriptionBtn" class="text-underline" rel="noopener noreferrer" href="pescription.php?patientId=<?php if (isset($formData['patientId'])) {
+                                                                                                                                                                                                            echo htmlspecialchars($formData['patientId']) . '';
+                                                                                                                                                                                                        } else {
+                                                                                                                                                                                                            echo getPatientId();
+                                                                                                                                                                                                        } ?>">Click here!</a></p>
+                    </div>
                     <div id="treatmentPlan" class="my-3 d-none">
                         <h2 class="text-center text-white">TREATMENT PLAN</h2>
                         <table class="table table-striped">
@@ -667,8 +677,33 @@ if (isset($_SESSION['patientData'])) {
                                                                 echo htmlspecialchars($formData['patientId']) . '';
                                                             } else {
                                                                 echo getPatientId();
-                                                            } ?>" class="btn btn-primary px-4 py-2">Edit</a>
+                                                            } ?>"
+                                class="btn btn-primary px-4 py-2">
+                                Edit
+                            </a>
+
                         </div>
+                    </div>
+                    <div class="my-3" >
+                        <h2 class="text-center text-white">Medicine Table</h2>
+                        <input type="hidden" name="patientId" value="<?php echo $patientId; ?>">
+                        <table class="table table-striped">
+                            <thead>
+                                <td class="text-center">Id</td>
+                                <td class="text-center">Medicine</td>
+                                <td class="text-center">Dosage</td>
+                                <td class="text-center">Timing</td>
+                                <td class="text-center">Duration</td>
+                            </thead>
+                            <tbody id="MedicineTable">
+
+                            </tbody>
+                        </table>
+                        <a href="pescription.php?patientId=<?php if (isset($formData['patientId'])) {
+                                                                echo htmlspecialchars($formData['patientId']) . '';
+                                                            } else {
+                                                                echo getPatientId();
+                                                            } ?>" class="btn btn-primary px-4 py-2">Edit</a>
                     </div>
                 </div>
                 <div class="d-flex justify-content-center">
@@ -678,8 +713,30 @@ if (isset($_SESSION['patientData'])) {
         </div>
     </div>
     <script>
+        function populateTable(data) {
+            const tableBody = document.getElementById("MedicineTable");
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            data.forEach((item, index) => {
+                const row = `
+            <tr>
+                <td class="text-center">${index + 1}</td>
+                <td class="text-center">${item.medicine}</td>
+                <td class="text-center">${item.dosage}</td>
+                <td class="text-center">${item.timing}</td>
+                <td class="text-center">${item.duration}</td>
+            </tr>
+        `;
+                tableBody.innerHTML += row;
+            });
+        }
         document.addEventListener("DOMContentLoaded", () => {
             let selectedTeethData = [];
+            const storedData = localStorage.getItem("medicines");
+            if (storedData) {
+                populateTable(JSON.parse(storedData));
+                document.getElementById("Pescription").classList.add("d-none");
+            }
             if (localStorage.getItem("selectedTeethData")) {
                 document.getElementById("treatmentPlan").classList.remove("d-none");
                 document.getElementById("teethLink").classList.add("d-none");
@@ -721,6 +778,7 @@ if (isset($_SESSION['patientData'])) {
             // })
 
             document.getElementById('teethBtn').addEventListener('click', function(event) {
+                const patientId = document.getElementById('patient-id').value;
                 event.preventDefault(); // Prevent the default link behavior
 
                 // Get the form element
@@ -738,7 +796,7 @@ if (isset($_SESSION['patientData'])) {
                     .then((data) => {
                         if (data.success) {
                             alert('Form submitted successfully!');
-                            window.location.href = "teethMap.php";
+                            window.location.href = "teethMap.php?patientId=" + patientId;
                         } else {
                             alert('Error submitting form: ' + data.error);
                         }
