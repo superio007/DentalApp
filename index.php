@@ -199,6 +199,7 @@ if (isset($_SESSION['patientData'])) {
             // echo "<script>window.location.href = 'process.php'</script>";
             echo "<script>window.reload();'</script>";
             echo "<script>localStorage.removeItem('selectedTeethData');</script>";
+            echo "<script>localStorage.removeItem('medicines');</script>";
             unset($formData);
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
@@ -208,7 +209,7 @@ if (isset($_SESSION['patientData'])) {
         $conn->close();
     }
     ?>
-    <?php include("slider.php");
+    <?php include_once("slider.php");
     include("navbar.php");
     ?>
     <div id="main">
@@ -653,11 +654,7 @@ if (isset($_SESSION['patientData'])) {
                         <p class="fw-bold text-white my-4">Click here to choose treatment plan : <a id="teethBtn" class="text-underline" rel="noopener noreferrer">Click here!</a></p>
                     </div>
                     <div id="Pescription">
-                        <p class="fw-bold text-white my-4">Click here to write Pescription : <a id="prescriptionBtn" class="text-underline" rel="noopener noreferrer" href="pescription.php?patientId=<?php if (isset($formData['patientId'])) {
-                                                                                                                                                                                                            echo htmlspecialchars($formData['patientId']) . '';
-                                                                                                                                                                                                        } else {
-                                                                                                                                                                                                            echo getPatientId();
-                                                                                                                                                                                                        } ?>">Click here!</a></p>
+                        <p class="fw-bold text-white my-4">Click here to write Pescription : <a id="prescriptionBtn" class="text-underline" rel="noopener noreferrer">Click here!</a></p>
                     </div>
                     <div id="treatmentPlan" class="my-3 d-none">
                         <h2 class="text-center text-white">TREATMENT PLAN</h2>
@@ -684,9 +681,9 @@ if (isset($_SESSION['patientData'])) {
 
                         </div>
                     </div>
-                    <div class="my-3" >
+                    <div id="MedicineDiv" class="my-3 d-none">
                         <h2 class="text-center text-white">Medicine Table</h2>
-                        <input type="hidden" name="patientId" value="<?php echo $patientId; ?>">
+                        <input type="hidden" name="patientId" value="<?php echo isset($formData['patientId']) ? $formData['patientId'] : getPatientId(); ?>">
                         <table class="table table-striped">
                             <thead>
                                 <td class="text-center">Id</td>
@@ -734,6 +731,7 @@ if (isset($_SESSION['patientData'])) {
             let selectedTeethData = [];
             const storedData = localStorage.getItem("medicines");
             if (storedData) {
+                document.getElementById("MedicineDiv").classList.remove("d-none");
                 populateTable(JSON.parse(storedData));
                 document.getElementById("Pescription").classList.add("d-none");
             }
@@ -761,22 +759,37 @@ if (isset($_SESSION['patientData'])) {
                 'patient_id': document.getElementById('patient-id').value
             };
             console.log(dataToSent);
+            // for store form data into session after clicking PRESCRIPTION
+            document.getElementById('prescriptionBtn').addEventListener('click', function(event) {
+                const patientId = document.getElementById('patient-id').value;
+                event.preventDefault(); // Prevent the default link behavior
 
-            // document.addEventListener('onsubmit', function(event, dataToSent) {
-            //     fetch('patientsData.php', {
-            //             method: 'POST',
-            //             body: selectedTeethData,
-            //         }).then((response) => response.json())
-            //         .then((data) => {
-            //             if (data.success) {
-            //                 alert('data send successfully!');
-            //                 window.location.href = "teethMap.php";
-            //             } else {
-            //                 alert('Error submitting form: ' + data.error);
-            //             }
-            //         })
-            // })
+                // Get the form element
+                const form = document.querySelector('form');
 
+                // Create a FormData object
+                const formData = new FormData(form);
+
+                // Send data using fetch API
+                fetch('storeSession.php', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then((response) => response.json()) // Assuming storeSession.php returns JSON
+                    .then((data) => {
+                        if (data.success) {
+                            alert('Form submitted successfully!');
+                            window.location.href = "pescription.php?patientId=" + patientId;
+                        } else {
+                            alert('Error submitting form: ' + data.error);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting the form.');
+                    });
+            });
+            // for store form data into session after clicking teethbtn
             document.getElementById('teethBtn').addEventListener('click', function(event) {
                 const patientId = document.getElementById('patient-id').value;
                 event.preventDefault(); // Prevent the default link behavior
