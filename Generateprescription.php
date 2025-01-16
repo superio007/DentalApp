@@ -3,53 +3,51 @@ session_start();
 require_once('vendor/tecnickcom/tcpdf/tcpdf.php');
 
 $patientData = $_SESSION['patientData'];
-$dentalData = $_SESSION['dentalData'];
+$prescriptionData = $_SESSION['prescriptionData'];
 function getFormattedDate($date = null)
 {
-  return $date ? date('d F Y', strtotime($date)) : date('d F Y');
+    return $date ? date('d F Y', strtotime($date)) : date('d F Y');
 }
 // Check session or default data
 $formData = $patientData ?? [
-  'name' => 'Omprakash Rai',
-  'sex' => 'Male',
-  'age' => 40,
-  'patientId' => 'T24072',
-  'address' => '123 Sample Address, City, State'
+    'name' => 'Omprakash Rai',
+    'sex' => 'Male',
+    'age' => 40,
+    'patientId' => 'T24072',
+    'address' => '123 Sample Address, City, State'
 ];
 $gender = ($formData['sex'] == 'Male') ? 'M' : 'F';
 $reasonTOVisit = ($formData['reason']);
+
 // Dynamic Data
 
-$treatmentData = $dentalData;
+$treatmentData = $prescriptionData;
 $invoiceData = [
-  'clinic' => [
-    'name' => 'Shree Sai Dental Lounge',
-    'phone1' => '7505132263',
-    'phone2' => '8355894900',
-    'email' => 'bhaveshbhalim09@outlook.com',
-    'address' => 'Next to Shastri Nagar Naka, Pokharan Rd no 1, Shastri Nagar, Thane west 400606'
-  ],
-  'billTo' => [
-    'name' => $formData['name'],
-    'age_sex' => "{$formData['age']}/$gender",
-    'patient_id' => $formData['patient_id'],
-    'address' => $formData['address']
-  ]
+    'clinic' => [
+        'name' => 'Shree Sai Dental Lounge',
+        'phone1' => '7505132263',
+        'phone2' => '8355894900',
+        'email' => 'bhaveshbhalim09@outlook.com',
+        'address' => 'Next to Shastri Nagar Naka, Pokharan Rd no 1, Shastri Nagar, Thane west 400606'
+    ],
+    'billTo' => [
+        'name' => $formData['name'],
+        'age_sex' => "{$formData['age']}/$gender",
+        'patient_id' => $formData['patient_id'],
+        'address' => $formData['address']
+    ]
 ];
 
 // Calculate total and generate table rows
 $total = 0;
 $tableRows = '';
 foreach ($treatmentData as $row) {
-  if (is_numeric($row['price'])) {
-    $total += $row['price'];
-  }
-  $tableRows .= '<tr>
-        <td>' . getFormattedDate() . '</td>
-        <td>' . $row['toothId'] . '</td>
-        <td>₹ ' . $row['price'] . '</td>
-    </tr>';
-  $surgeries[] = $row['surgery'];
+    $tableRows .= '<tr>' .
+        '<td>' . ($row['medicine_name'] ?? '-') . '</td>' .
+        '<td>' . ($row['dosage'] ?? '-') . '</td>' .
+        '<td>' . ($row['timing'] ?? '-') . '</td>' .
+        '<td>' . ($row['duration'] ?? '-') . '</td>' .
+    '</tr>';
 }
 
 // Initialize TCPDF
@@ -69,7 +67,7 @@ $html = '
     th { background-color: #f2f2f2; }
 </style>
 <h1 style="text-align:center;">' . $invoiceData['clinic']['name'] . '</h1>
-<h3 style="text-align:center">Invoice</h3>
+<h3 style="text-align:center">Prescription</h3>
 <p>
     <strong>Dr. Bhavesh Suresh Bhalim BDS A-55138</strong><br>
     Dr. Jay Yashwant Pawshe BDS A-53661<br>
@@ -77,17 +75,14 @@ $html = '
     Phone: ' . $invoiceData['clinic']['phone1'] . ', ' . $invoiceData['clinic']['phone2'] . '<br>
     E-mail: ' . $invoiceData['clinic']['email'] . '
 </p>
+
 <h3 style="text-transform:uppercase">Suffering</h3>
 <p>
-    <strong>Treatment Done:</strong>' . ' ' . $reasonTOVisit . '<br>
-</p>
-<h3>TREATMENT</h3>
-<p>
-    <strong>Treatment Done:</strong> ' . implode(', ', $surgeries) . '<br>
+    <strong>Treatment Done:</strong>'. ' '.$reasonTOVisit.'<br>
     <strong>Date:</strong> ' . getFormattedDate() . '
 </p>
 
-<h3>BILL TO:</h3>
+<h3>PATIENT DETAILS:</h3>
 <p>
     <strong>Name:</strong> ' . $invoiceData['billTo']['name'] . '<br>
     <strong>Age/Sex:</strong> ' . $invoiceData['billTo']['age_sex'] . '<br>
@@ -97,14 +92,13 @@ $html = '
 
 <table>
     <tr>
-        <th>Date</th>
-        <th>Tooth No.</th>
-        <th>Amount</th>
+        <th>Medicine Name</th>
+        <th>Dosage</th>
+        <th>Timing</th>
+        <th>Duration</th>
     </tr>
     ' . $tableRows . '
 </table>
-
-<p><strong>Total:</strong> ₹ ' . number_format($total, 2) . '</p>
 <p style="text-align:center; font-size:16px;">Thank you!!</p>
 ';
 

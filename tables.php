@@ -82,14 +82,19 @@
                                             <button class="btn btn-primary invoice" data-patient-id="${row.patient_id}">Invoice</button>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary">Prescription</button>
+                                            <button class="btn btn-primary prescription" data-patient-id="${row.patient_id}">Prescription</button>
                                         </td>
                                     </tr>
                                 `;
                                 tableBody.append(tableRow);
                             });
                         } else {
-                            alert("No more records to display.");
+                            const tableRow = `
+                                    <tr>
+                                        <td colspan="10" class="text-center">No Data Available!</td>
+                                    </tr>
+                                `;
+                            tableBody.append(tableRow);
                         }
 
                         // Enable/Disable buttons based on offset
@@ -125,7 +130,8 @@
                     url: 'fetchAndStorePatientData.php', // PHP script URL
                     method: 'POST',
                     data: {
-                        patient_id: patientId
+                        patient_id: patientId,
+                        type: "invoice",
                     },
                     success: function(response) {
                         processPatientData(response);
@@ -137,6 +143,45 @@
                 });
             });
 
+            // Handle Prescription button click
+            $('table').on('click', '.prescription', function() {
+                const patientId = $(this).data('patient-id');
+                $.ajax({
+                    url: 'fetchAndStorePatientData.php', // PHP script URL
+                    method: 'POST',
+                    data: {
+                        patient_id: patientId,
+                        type: "prescription",
+                    },
+                    success: function(response) {
+                        processprescriptionData(response);
+                        console.log(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while processing the request.');
+                    }
+                });
+            });
+            // to process prescription data
+            function processprescriptionData(data) {
+                $.ajax({
+                    url: 'generateprescriptionSession.php', // PHP script URL
+                    method: 'POST',
+                    contentType: 'application/json', // Specify JSON format
+                    data: JSON.stringify(data), // Send data as a JSON string
+                    success: function(response) {
+                        console.log(response); // Log the response
+                        // alert('Prescription Generated successfully!');
+                        window.location.href = 'Generateprescription.php';
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                        alert('An error occurred while generating the invoice.');
+                    }
+                });
+            }
+            // to process invoice data
             function processPatientData(data) {
                 $.ajax({
                     url: 'generateInvoiceSession.php', // PHP script URL

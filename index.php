@@ -200,7 +200,7 @@ if (isset($_SESSION['patientData'])) {
             echo "<script>window.reload();'</script>";
             echo "<script>localStorage.removeItem('selectedTeethData');</script>";
             echo "<script>localStorage.removeItem('medicines');</script>";
-            unset($formData);
+            unset($_SESSION['patientData']);
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
