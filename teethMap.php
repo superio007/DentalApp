@@ -344,7 +344,7 @@
         success: function(response) {
           console.log(response); // Handle the response from the server
           // alert('Dental data saved successfully!');
-          window.location.href = "index.php";
+          window.location.href = "index.php?patientId=" + patientId;
         },
         error: function(xhr, status, error) {
           console.error('Error:', error);

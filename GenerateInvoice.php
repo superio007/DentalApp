@@ -117,7 +117,7 @@ file_put_contents('invoice.pdf', $pdfOutput); // Save the PDF to a file on the s
 
 // Send the file for download
 header('Content-Type: application/pdf');
-header('Content-Disposition: attachment; filename="' . $invoiceData['billTo']['name'] . '.pdf"');
+header('Content-Disposition: attachment; filename="' . $invoiceData['billTo']['name'].'_Invoice' . '.pdf"');
 header('Content-Length: ' . filesize('invoice.pdf'));
 readfile('invoice.pdf');
 

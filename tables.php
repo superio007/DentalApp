@@ -15,6 +15,7 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -172,12 +173,20 @@
                     data: JSON.stringify(data), // Send data as a JSON string
                     success: function(response) {
                         console.log(response); // Log the response
-                        // alert('Prescription Generated successfully!');
+                        Swal.fire({
+                            title: "Good Job!",
+                            text: "Form submitted successfully",
+                            icon: "success"
+                        });
                         window.location.href = 'Generateprescription.php';
                     },
                     error: function(xhr, status, error) {
                         console.error('Error:', error);
-                        alert('An error occurred while generating the invoice.');
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: `${data.error}`
+                        });
                     }
                 });
             }
@@ -190,12 +199,20 @@
                     data: JSON.stringify(data), // Send data as a JSON string
                     success: function(response) {
                         console.log(response); // Log the response
-                        alert('Invoice generated successfully!');
+                        Swal.fire({
+                            title: "Good Job!",
+                            text: "Invoice generated successfully",
+                            icon: "success"
+                        });
                         window.location.href = 'GenerateInvoice.php';
                     },
                     error: function(xhr, status, error) {
                         console.error('Error:', error);
-                        alert('An error occurred while generating the invoice.');
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: `${data.error}`
+                        });
                     }
                 });
             }

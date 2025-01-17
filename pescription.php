@@ -152,7 +152,7 @@
                         const res = JSON.parse(response);
                         if (res.status === "success") {
                             alert("Data saved successfully!");
-                            window.location.href = "index.php";
+                            window.location.href = "index.php?patientId=" + patientId;
                         } else {
                             alert(res.message);
                         }

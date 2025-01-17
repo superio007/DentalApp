@@ -3,6 +3,10 @@ session_start();
 if (isset($_SESSION['patientData'])) {
     $formData = $_SESSION['patientData'];
 }
+if (isset($_GET['patientId'])) {
+    $patientId = $_GET['patientId'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,6 +24,7 @@ if (isset($_SESSION['patientData'])) {
         rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
         crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         #main {
             /* background-color: #73c7e3; */
@@ -57,6 +62,7 @@ if (isset($_SESSION['patientData'])) {
         return rand(000000, 999999);
     }
     if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit'])) {
+        unset($_SESSION['patientData']);
         $name = $_POST['name'];
         $age = $_POST['age'];
         $sex = $_POST['sex'];
@@ -193,14 +199,9 @@ if (isset($_SESSION['patientData'])) {
 
         // Execute query
         if ($conn->query($sql) == TRUE) {
-            // unset($_SESSION['patientData']);
-            // echo "<script>window.localStorage.removeItem(\"selectedTeethData\");</script>";
-            // echo "<script>window.location.reload();</script>";
-            // echo "<script>window.location.href = 'process.php'</script>";
             echo "<script>window.reload();'</script>";
             echo "<script>localStorage.removeItem('selectedTeethData');</script>";
             echo "<script>localStorage.removeItem('medicines');</script>";
-            unset($_SESSION['patientData']);
         } else {
             echo "Error: " . $sql . "<br>" . $conn->error;
         }
@@ -280,8 +281,8 @@ if (isset($_SESSION['patientData'])) {
                                     readonly
                                     name="patientId"
                                     required
-                                    value="<?php if (isset($formData['patientId'])) {
-                                                echo htmlspecialchars($formData['patientId']) . '';
+                                    value="<?php if (isset($patientId) && $patientId != '') {
+                                                echo htmlspecialchars($patientId) . '';
                                             } else {
                                                 echo getPatientId();
                                             } ?>"
@@ -761,8 +762,8 @@ if (isset($_SESSION['patientData'])) {
             console.log(dataToSent);
             // for store form data into session after clicking PRESCRIPTION
             document.getElementById('prescriptionBtn').addEventListener('click', function(event) {
-                const patientId = document.getElementById('patient-id').value;
-                event.preventDefault(); // Prevent the default link behavior
+                const patientId = document.getElementById('patient-id').value; // Get the patientId
+                event.preventDefault(); // Prevent default link behavior
 
                 // Get the form element
                 const form = document.querySelector('form');
@@ -770,18 +771,22 @@ if (isset($_SESSION['patientData'])) {
                 // Create a FormData object
                 const formData = new FormData(form);
 
-                // Send data using fetch API
+                // Explicitly add the readonly patientId field to the FormData object
+                formData.append('patientId', patientId);
+
+                // Send data using the Fetch API
                 fetch('storeSession.php', {
                         method: 'POST',
                         body: formData,
                     })
-                    .then((response) => response.json()) // Assuming storeSession.php returns JSON
+                    .then((response) => response.json()) // Parse JSON response
                     .then((data) => {
                         if (data.success) {
                             alert('Form submitted successfully!');
+                            // Navigate to the prescription page with patientId as a query parameter
                             window.location.href = "pescription.php?patientId=" + patientId;
                         } else {
-                            alert('Error submitting form: ' + data.error);
+                            alert('Error submitting form: ' + data.message);
                         }
                     })
                     .catch((error) => {
@@ -791,7 +796,7 @@ if (isset($_SESSION['patientData'])) {
             });
             // for store form data into session after clicking teethbtn
             document.getElementById('teethBtn').addEventListener('click', function(event) {
-                const patientId = document.getElementById('patient-id').value;
+                const PatientId = document.getElementById('patient-id').value;
                 event.preventDefault(); // Prevent the default link behavior
 
                 // Get the form element
@@ -799,6 +804,9 @@ if (isset($_SESSION['patientData'])) {
 
                 // Create a FormData object
                 const formData = new FormData(form);
+
+                // Add the readonly patientId field manually to the FormData object
+                formData.append('patientId', PatientId);
 
                 // Send data using fetch API
                 fetch('storeSession.php', {
@@ -809,9 +817,10 @@ if (isset($_SESSION['patientData'])) {
                     .then((data) => {
                         if (data.success) {
                             alert('Form submitted successfully!');
-                            window.location.href = "teethMap.php?patientId=" + patientId;
+                            // Navigate to teethMap.php with patientId in the query string
+                            window.location.href = "teethMap.php?patientId=" + PatientId;
                         } else {
-                            alert('Error submitting form: ' + data.error);
+                            alert('Error submitting form: ' + data.message);
                         }
                     })
                     .catch((error) => {
@@ -819,7 +828,7 @@ if (isset($_SESSION['patientData'])) {
                         alert('An error occurred while submitting the form.');
                     });
             });
-        })
+        });
     </script>
 </body>
 
